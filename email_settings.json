@@ -1,11 +1,13 @@
 {
+
     "smtp_server": "smtp.gmail.com",
     "port": 587,
 
-    "sender": "PutSenderHere@gmail.com",
-    "sender_app_pass": "PutYourAppPassHere",
+    "sender": "abodena3al@gmail.com",
+    "sender_app_pass": "avytikqznhqcsegv",
 
-    "receiver": "PutReceiverHere@gmail.com",
+    "receiver": "abodenaal@gmail.com",
     
-    "subject": "Type email subject here"
+    "subject": "Daily Exchange Rates"
+
 }

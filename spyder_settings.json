@@ -3,6 +3,10 @@
         "SpyderVersion": "0.1",
         "Dev": "Abdulaziz Nal",
         "Email": "abodenaal@gmail.com"
-    }
-    
+    },
+    "currentFileIndex": 10,
+    "startingHour": 9,
+    "endingHour": 18,
+    "dataPointFreq": 21,
+    "intervalBetweenScrapes": 3
 }

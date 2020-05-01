@@ -1,25 +1,26 @@
-# TODO: set this up to it's more of a general spyder for all others to inherit from
 from bs4.element import Tag
-from bs4 import BeautifulSoup
 from datetime import datetime
-from time import sleep
 import json
+
+from abc import ABCMeta, abstractmethod
 
 from BaseSpyder import BaseSpyder
 
 
+# TODO: write the following in docs:
+#   After Inheriting this class, all you need to do is define the two abstract methods,
+#   making sure to return the values in the proper structure. the rest is handled by
+#   the filter_data method
+
 class BankSpyder(BaseSpyder):
+    ___metaclass__ = ABCMeta
 
     def __init__(self, url, load_buffer=3, options=None):
         super().__init__(url, load_buffer=load_buffer, options=options)
 
-        # Website's built-in button to refresh exchange rates w/o refreshing
-        self.display_button = self.driver.find_element_by_class_name('dK_button1')
-
-
     def load_settings(self, filepath='spyder_settings.json'):
         """
-        Loads spyder_settings.json (default name).
+        Loads spyder_settings.json (default name)
         returns spyder_settings as <dict> 
         """
         self.__settings_path = filepath
@@ -46,71 +47,3 @@ class BankSpyder(BaseSpyder):
                 _file.write(str(self.settings))
 
                 print(f"successfully saved data to {_filename}")
-
-    def __getExchangeRateTable(self):
-        """returns table as bs4.BeautifulSoup object"""
-        table = self.page_source.find(name="div", attrs={'id': 'htmlDefaultTableCover'})
-        return table
-
-    def doYourThing(self):
-        """
-        returns { currency: { buying: float, selling: float }}
-        """
-
-        table = self.__getExchangeRateTable()
-
-        super_dict = dict()
-
-        for row in table:
-            # example row value: 'USD, Sold @ 6.7702 , Bought @ 7.1147'
-            row_val = self.__getRowValue(row)
-            super_dict[row_val[0]] = {
-                'selling': row_val[1],
-                'buying':  row_val[2]
-            }
-
-        return super_dict
-
-    def __getRowValue(self, row: Tag):
-        # region row structure
-        # each row is a div made up of the following divs:
-
-        # div.dK_Line_Item1
-        #   <img ...>
-        #   ABC                     ************
-        #   <span>...</span>
-
-        # div.dK_Line_Item2
-        #   current sell price      ************
-
-        # div.dK_Line_Item3
-        #   current buy price       ************
-        # endregion row structure
-
-        try:
-            currency = row.find('div', {'class': 'dK_Line_Item1'}).text[1:4]
-            selling = row.find('div', {'class': 'dK_Line_Item2'}).text.strip()
-            buying = row.find('div', {'class': 'dK_Line_Item3'}).text.strip()
-
-            return currency, float(selling), float(buying)
-
-        except Exception as e:
-            print(f"Error in getRowValue: {e}")
-
-    def get_timestamp(self, appending_to_file_name=False):
-        """
-        returns a formatted timestamp string (e.g "2020-09-25 Weekday 16:45:37" )
-        """
-        if appending_to_file_name:
-            formatted_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-        else:
-            formatted_time = datetime.now().strftime("%Y-%m-%d %A %H:%M:%S")
-
-        return formatted_time
-
-    def refresh_page(self):
-        self.display_button.click()
-        sleep(self.load_buffer / 2)
-
-        # must reassign page source to get new changes
-        self.page_source = BeautifulSoup(self.driver.page_source, features="lxml")

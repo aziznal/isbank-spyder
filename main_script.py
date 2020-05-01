@@ -24,6 +24,7 @@ import functions as fn
 special_options = FirefoxOptions()
 special_options.headless = True
 
+# BUG: 'special_options' should be refactored to 'options'. work on it and find any other mishaps. your past self was too tired.
 spyder = BankSpyder("https://www.isbank.com.tr/en/foreign-exchange-rates", special_options=special_options)
 
 print("Spyder is running..")

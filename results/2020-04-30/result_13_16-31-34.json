@@ -1,0 +1,51 @@
+{
+    "USD": {
+        "selling": 6.9576,
+        "buying": 7.0064
+    },
+    "EUR": {
+        "selling": 7.5483,
+        "buying": 7.6013
+    },
+    "GBP": {
+        "selling": 8.6963,
+        "buying": 8.7573
+    },
+    "AUD": {
+        "selling": 4.528,
+        "buying": 4.5597
+    },
+    "DKK": {
+        "selling": 1.012,
+        "buying": 1.0191
+    },
+    "SEK": {
+        "selling": 0.70936,
+        "buying": 0.71434
+    },
+    "CHF": {
+        "selling": 7.1469,
+        "buying": 7.1971
+    },
+    "100": {
+        "selling": 6.523,
+        "buying": 6.569
+    },
+    "CAD": {
+        "selling": 5.008,
+        "buying": 5.0431
+    },
+    "KWD": {
+        "selling": 22.2989,
+        "buying": 22.7836
+    },
+    "NOK": {
+        "selling": 0.6759,
+        "buying": 0.68064
+    },
+    "SAR": {
+        "selling": 1.8368,
+        "buying": 1.8767
+    },
+    "timestamp": "2020-04-30 Thursday 16:31:34"
+}

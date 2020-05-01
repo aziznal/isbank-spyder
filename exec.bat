@@ -1,4 +1,2 @@
-cd C:\Users\Aziz\Desktop\Programming\Python\WebScraping\isbank_currency_prices
-echo "Running Exchange Rate Monitor Script"
+cd "C:\Users\Aziz\Desktop\Background Scripts\BankSpyder\isbank_spyder"
 python main_script.py
-echo "Finished Running Script"

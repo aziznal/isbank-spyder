@@ -3,6 +3,16 @@ from datetime import datetime
 import json
 
 
+project_settings = {}
+
+
+def load_project_settings() -> dict:
+    global project_settings
+    with open('project_settings.json', 'r') as settings_json:
+        project_settings = json.load(settings_json)
+        return project_settings
+
+
 def get_current_time():
     """Returns a dict with keys ['hour'] and ['minutes'] with <int> as their values"""
     current_time = datetime.now().strftime("%H-%M").split('-')
@@ -34,8 +44,9 @@ def set_new_interval(starting_hour: int, ending_hour: int, required_freq: int = 
 
 def save_scraped_data(spyder, results):
     # path subfolder to save current session's data in.
-    results_folder_path = os.getcwd() + "\\results\\" + \
-        spyder.get_timestamp(appending_to_file_name=True).split(' ')[0]     # subfolder name only includes year-day-month
+    results_folder_path = project_settings['results_path'] + \
+        spyder.get_timestamp(appending_to_file_name=True).split(
+            ' ')[0]     # subfolder name only includes year-day-month
 
     # if this is the first loop cycle, this creates the subfolder
     if not os.path.isdir(results_folder_path):
@@ -53,6 +64,7 @@ def save_scraped_data(spyder, results):
         spyder.settings['currentFileIndex'] += 1
 
     return results_folder_path
+
 
 def numth(number):
     """

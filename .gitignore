@@ -1,2 +1,5 @@
+.gitignore
 bank_spyders/
 WebScrapingEssentials/
+geckodriver.log
+__pycache__/

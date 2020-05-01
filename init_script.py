@@ -5,3 +5,7 @@
 # TODO: setup exec.bat. Template of contents:
 #       cd To/Project/Absolute/Path
 #       python main_script.py
+
+# TODO: check structure of the scraper's files
+
+# TODO: create missing folders and/or files and provide warnings

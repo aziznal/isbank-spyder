@@ -1,3 +1,4 @@
+# TODO: set this up so it's a general grapher which scrapers inherit from when making their own graphers
 import matplotlib.pyplot as plt
 import os
 import json

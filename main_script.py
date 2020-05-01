@@ -1,3 +1,5 @@
+# TODO: recheck this entire script so it fits with the new file structure
+# TODO: use project_settings.json to manage global settings instead of hardcoding them
 from datetime import datetime
 import json
 import os

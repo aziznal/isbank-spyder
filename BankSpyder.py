@@ -1,3 +1,4 @@
+# TODO: set this up to it's more of a general spyder for all others to inherit from
 from bs4.element import Tag
 from bs4 import BeautifulSoup
 from datetime import datetime

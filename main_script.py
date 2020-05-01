@@ -1,31 +1,30 @@
 # TODO: recheck this entire script so it fits with the new file structure
 # TODO: use project_settings.json to manage global settings instead of hardcoding them
-from datetime import datetime
-import json
-import os
 from time import sleep
+import json
 
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
-from BankSpyder import BankSpyder
+from IsbankSpyder import IsbankSpyder
 from ResultGrapher import ResultGrapher
 from EmailSender import EmailSender
 import functions as fn
 
 # TODO: find areas where exceptions may be raised and handle them so things stay nice and functional
 # IDEA: design a GUI to use with the program at a (much) later time
-
+# TODO: implement something like a progress bar to show the scraping progress insteed of whatever you have now
 # TODO: add a task in windows task scheduler to run the script everyday at 09:00
 
+# Load global project settings
+project_settings = fn.load_project_settings()
 
 # region Data Getting
 # spooder
 special_options = FirefoxOptions()
 special_options.headless = True
 
-# BUG: 'special_options' should be refactored to 'options'. work on it and find any other mishaps. your past self was too tired.
-spyder = BankSpyder("https://www.isbank.com.tr/en/foreign-exchange-rates", special_options=special_options)
+spyder = IsbankSpyder("https://www.isbank.com.tr/en/foreign-exchange-rates", options=special_options)
 
 print("Spyder is running..")
 
@@ -38,14 +37,10 @@ print("Spyder is running..")
 #     )
 
 # TODO: delete later
-required_point_freq = 21
-interval = fn.set_new_interval(
-    3,
-    6,
-    required_point_freq
-)
+required_point_freq = 5
+interval = 1
 
-print(f"Each loop will take approx. {round(interval * 60, 1)} minutes")
+print(f"Each loop will take approx. {interval} seconds")
 
 loop_count = 0
 
@@ -56,21 +51,21 @@ while True:
     if loop_count == required_point_freq:
         break    
 
-    print(f"Starting {fn.numth(loop_count)}/{required_point_freq} Loop")
+    print(f"Starting {fn.numth(loop_count + 1)}/{required_point_freq}")
     loop_count += 1
 
     current_time = fn.get_current_time()
 
     # scrippity scrape
     try:
-        results = spyder.doYourThing()
+        results = spyder.filter_data()
         results["timestamp"] = spyder.get_timestamp()
 
         # path is used again in ResultGrapher
-        results_folder_path = fn.save_scraped_data(spyder=spyder, results=results)
+        current_results_path = fn.save_scraped_data(spyder=spyder, results=results)
 
         # wait, refresh, then restart loop
-        # IDEA: using built-in 'Display' button instead of refreshing page takes less time
+        print("Waiting to start next loop...")
         sleep(interval)
         spyder.refresh_page()
 
@@ -85,7 +80,7 @@ while True:
 # region Graphing
 
 print("\nFinished Scraping Sucessfully. Creating Graph..")
-grapher = ResultGrapher(results_folder_path=results_folder_path)
+grapher = ResultGrapher(results_folder_path=current_results_path)
 grapher.create_graph(save=True, show=True)
 
 print("Graph Created Sucessfully")
@@ -94,26 +89,16 @@ print("Graph Created Sucessfully")
 
 # region Sending Email
 
-email_settings = {
+print("\nSending Results as Email")
 
-    "smtp_server": "smtp.gmail.com",
-    "port": 587,
-
-    "sender": "abodena3al@gmail.com",
-    "sender_app_pass": "avytikqznhqcsegv",
-
-    "receiver": "abodenaal@gmail.com",
-    
-    "subject": "Daily Exchange Rates"
-
-}
-
-sender = EmailSender(settings=email_settings)
+sender = EmailSender()
 
 sender.set_email_body("email_template.html", "I don't even know why this is here")
-sender.set_attachment('graphing_results/2020-04-30.png')
+sender.set_attachment('graphing_results/2020-05-01.png')
 
 sender.send_email()
+
+print("Results sent successfully")
 
 # endregion
 

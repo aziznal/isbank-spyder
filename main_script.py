@@ -11,6 +11,11 @@ from ResultGrapher import ResultGrapher
 from EmailSender import EmailSender
 import functions as fn
 
+from time import sleep
+
+from progress.bar import ChargingBar as Bar
+
+
 # TODO: find areas where exceptions may be raised and handle them so things stay nice and functional
 # IDEA: design a GUI to use with the program at a (much) later time
 # TODO: implement something like a progress bar to show the scraping progress insteed of whatever you have now
@@ -37,8 +42,10 @@ print("Spyder is running..")
 #     )
 
 # TODO: delete later
-required_point_freq = 5
-interval = 1
+required_point_freq = 10
+interval = 10
+
+interval /= 100  # dividing interval to be able to advance progress bar
 
 print(f"Each loop will take approx. {interval} seconds")
 
@@ -65,8 +72,14 @@ while True:
         current_results_path = fn.save_scraped_data(spyder=spyder, results=results)
 
         # wait, refresh, then restart loop
-        print("Waiting to start next loop...")
-        sleep(interval)
+        bar = Bar('Waiting for next step', max=100, suffix='%(percent)d%%')
+        
+        for _ in range(100):
+            sleep(interval)
+            bar.next()
+
+        bar.finish()
+
         spyder.refresh_page()
 
     except WebDriverException as e:

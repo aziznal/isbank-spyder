@@ -41,7 +41,7 @@ print("Spyder is running..")
 #     required_point_freq
 #     )
 
-required_point_freq = 0
+required_point_freq = 23
 interval = fn.set_new_interval(11, 17, required_point_freq)
 
 interval /= 100  # dividing interval to be able to advance progress bar
@@ -107,7 +107,7 @@ print("\nSending Results as Email")
 sender = EmailSender()
 
 sender.set_email_body("email_template.html", "I don't even know why this is here")
-sender.set_attachment(attachment_path)
+sender.set_attachment(project_settings['graphing_results_path'] + attachment_path)
 
 sender.send_email()
 

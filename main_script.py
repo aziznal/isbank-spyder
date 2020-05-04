@@ -41,7 +41,7 @@ print("Spyder is running..")
 #     required_point_freq
 #     )
 
-required_point_freq = 23
+required_point_freq = 0
 interval = fn.set_new_interval(11, 17, required_point_freq)
 
 interval /= 100  # dividing interval to be able to advance progress bar
@@ -51,6 +51,7 @@ print(f"Each loop will take approx. {interval * 100} seconds")
 loop_count = 0
 
 # creates a new data point every loop
+# FIXME: (while True) should be changed to use the single break condition instead
 while True:
 
     # Break Condition
@@ -93,7 +94,7 @@ while True:
 
 print("\nFinished Scraping Sucessfully. Creating Graph..")
 grapher = ResultGrapher(results_folder_path=current_results_path)
-grapher.create_graph(save=True, show=True)
+attachment_path = grapher.create_graph(save=True, show=False)
 
 print("Graph Created Sucessfully")
 
@@ -106,7 +107,7 @@ print("\nSending Results as Email")
 sender = EmailSender()
 
 sender.set_email_body("email_template.html", "I don't even know why this is here")
-sender.set_attachment('graphing_results/2020-05-01.png')
+sender.set_attachment(attachment_path)
 
 sender.send_email()
 

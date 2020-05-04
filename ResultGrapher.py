@@ -223,6 +223,9 @@ class ResultGrapher:
         
         plt.tight_layout(pad=2)
         
+        if show:
+            plt.show()
+
         if save:
             if self.time_interval == "today":
 
@@ -232,8 +235,7 @@ class ResultGrapher:
                     plt.savefig('graphing_results/' +
                                 self.starting_date + '.png', dpi=300)
 
-        if show:
-            plt.show()
+            return self.starting_date + '.png'
 
 
 # grapher = ResultGrapher("results\\2020-04-30\\")

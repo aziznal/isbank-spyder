@@ -42,7 +42,7 @@ print("Spyder is running..")
 #     )
 
 required_point_freq = 23
-interval = fn.set_new_interval(11, 17, required_point_freq)
+interval = fn.set_new_interval(13, 17, required_point_freq)
 
 interval /= 100  # dividing interval to be able to advance progress bar
 

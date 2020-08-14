@@ -1,39 +1,56 @@
 import os
+import platform
 import json
 
 
-# region creating project_settings.json
+def init_linux():
+    pass
 
-abs_path = os.getcwd()
 
-project_settings = {
-    'abs_path': abs_path,
-    'results_path': abs_path + "\\results\\",
-    'graphing_results_path': abs_path + "\\graphing_results\\"
-}
+def init_windows():
+    pass
 
-check_list = [os.path.isdir(project_settings['abs_path']),
-              os.path.isdir(project_settings['results_path']),
-              os.path.isdir(project_settings['graphing_results_path'])]
 
-if all(check_list):
-    print("All folders were found, proceeding...")
-else:
-    raise FileNotFoundError("re-check your structure or re-clone the repo")
+def initialize_project():
+    current_os = platform.system()
 
-with open("project_settings.json", "w") as project_settings_file:
-    json.dump(project_settings, project_settings_file, indent=4)
+    if current_os == 'Linux':
+        init_linux()
+    elif current_os == 'Windows':
+        init_windows()
+    else:
+        raise OSError("Unsupported Platform: %s" % current_os)
 
-# endregion
+    abs_path = os.getcwd()
 
-# region creating exec.bat
+    project_settings = {
+        'abs_path': abs_path,
+        'results_path': abs_path + "\\results\\",
+        'graphing_results_path': abs_path + "\\graphing_results\\"
+    }
 
-command_instructions = [
-    f'cd "{abs_path}"',
-    'python main_script.py'
-]
+    check_list = [os.path.isdir(path_) for path_ in project_settings]
 
-with open('exec.bat', 'w') as exec_file:
-    [exec_file.write(line + "\n") for line in command_instructions]
+    if all(check_list):
+        print("All folders were found, proceeding...")
+    else:
+        raise FileNotFoundError("re-check your structure or re-clone the repo")
 
-# endregion
+    with open("project_settings.json", "w") as project_settings_file:
+        json.dump(project_settings, project_settings_file, indent=4)
+
+    # endregion
+
+    # region creating exec.bat
+
+    command_instructions = [
+        f'cd "{abs_path}"',
+        'python main_script.py'
+    ]
+
+    with open('exec.bat', 'w') as exec_file:
+        [exec_file.write(line + "\n") for line in command_instructions]
+
+
+if __name__ == "__main__":
+    initialize_project()

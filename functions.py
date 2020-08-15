@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 import json
 
+from ResultGrapher import ResultGrapher
+from EmailSender import EmailSender
 
 project_settings = {}
 
@@ -23,21 +25,15 @@ def get_current_time():
     }
 
 
-def set_new_interval(starting_hour: int, ending_hour: int, required_freq: int = 20):
-    """
-    returns: <int> seconds to wait between scrapes
+def create_new_loop_interval(start_hour: int, stop_hour: int, loop_count: int = 20):
 
-    @param starting_hour: when scraper should start.
+    """ returns a time (in seconds) given by the formula:
 
-    @param ending_hour: when scraper should stop.
-
-    @param required_freq: needed point frequency on graph.
+        [ (stop_hour - start_hour) * 60 * 60 ] / loop_count
     """
 
-    # total seconds available between in given interval
-    total_available_time = (ending_hour - starting_hour) * 60 * 60
-
-    interval = total_available_time // required_freq
+    total_available_time = (stop_hour - start_hour) * 60 * 60   # in seconds
+    interval = total_available_time // loop_count
 
     return interval
 
@@ -64,6 +60,33 @@ def save_scraped_data(spyder, results):
         spyder.settings['currentFileIndex'] += 1
 
     return results_folder_path
+
+
+def create_graph(path_to_results):
+    print("\nFinished Scraping Sucessfully. Creating Graph..")
+
+    grapher = ResultGrapher(results_folder_path=path_to_results)
+    path_to_graph = grapher.create_graph(save=True, show=False)    
+
+    print("Graph Created Sucessfully")
+
+    return path_to_graph
+
+
+def send_results_as_email(path_to_graph):
+
+    print("\nSending Results as Email")
+
+    sender = EmailSender()
+
+    sender.set_email_body("email_template.html",
+                        "I don't even know why this is here")
+    sender.set_attachment(
+        project_settings['graphing_results_path'] + path_to_graph)
+
+    sender.send_email()
+
+    print("Email sent successfully")
 
 
 def numth(number):

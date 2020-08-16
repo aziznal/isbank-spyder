@@ -5,8 +5,6 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from IsbankSpyder import IsbankSpyder
-from ResultGrapher import ResultGrapher
-from EmailSender import EmailSender
 import functions as fn
 
 
@@ -41,7 +39,7 @@ while True:
 
     # scrippity scrape
     try:
-        results = spyder.filter_data()
+        results = spyder.get_single_reading()
         results["timestamp"] = spyder.get_timestamp()
 
         # path is used again in ResultGrapher

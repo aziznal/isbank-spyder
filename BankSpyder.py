@@ -10,7 +10,6 @@ from BaseSpyder import BaseSpyder
 #   the filter_data method
 
 class BankSpyder(BaseSpyder):
-    ___metaclass__ = ABCMeta
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

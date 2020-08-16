@@ -39,6 +39,7 @@ def create_new_loop_interval(start_hour: int, stop_hour: int, loop_count: int = 
 
 
 def save_scraped_data(spyder, results):
+    # TODO: save all data in a single file instead of multiple
     # path subfolder to save current session's data in.
     results_folder_path = project_settings['results_path'] + \
         spyder.get_timestamp(appending_to_file_name=True).split(

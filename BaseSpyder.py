@@ -17,13 +17,10 @@ class BaseSpyder:
     def __init__(self, url, buffer_time=3, options=default_options, path_to_settings="spyder_settings.json", **kwargs):
         """ 
         Args:
-
+        
             url (str): page to load when browser is first launched
-
-            buffer_time (int, optional): a wait-time (in seconds) to confirm things like page loads. Defaults to 3.
-
+            buffer_time (int, optional): a wait-time (in seconds) to allow things like page loads to finish. Defaults to 3.
             options (selenium.webdriver.firefox.options.Options, optional): Use to pass custom options to the browser.
-
         """
 
         self.buffer_time = buffer_time
@@ -35,10 +32,10 @@ class BaseSpyder:
  
         self.goto(url)
 
-        self.page_soup = self.__load_page_soup()
+        self.page_soup = self._load_page_soup()
 
 
-    def __load_page_soup(self):
+    def _load_page_soup(self):
         return BeautifulSoup(self.page_source, features="lxml")
 
     @property
@@ -69,7 +66,7 @@ class BaseSpyder:
         self.wait()
 
         # refresh page source to get new changes
-        self.page_soup = self.__load_page_soup()
+        self.page_soup = self._load_page_soup()
 
     def load_settings(self):
         """

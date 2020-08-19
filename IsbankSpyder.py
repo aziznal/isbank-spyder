@@ -4,64 +4,117 @@ from time import sleep
 
 from BankSpyder import BankSpyder
 
+from selenium.common.exceptions import *
+
+from CustomExceptions import *
+
 
 class IsbankSpyder(BankSpyder):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Website's built-in button to refresh exchange rates w/o refreshing whole page
-        self._display_button = self._driver.find_element_by_class_name(
-            'dK_button1')
+        self._refresh_button = self._get_refresh_button()
+        self.refresh_page()
 
-    def _get_exchange_rate_table(self):
-        """returns table as bs4.BeautifulSoup object"""
-        # TODO: update object name
-        table = self.page_soup.find(
-            name="div", attrs={'id': 'htmlDefaultTableCover'})
-        return table
+        # NOTE: this is necessary to update the page html structure
 
-    def _get_row_value(self):
-        # TODO: update object names
-        try:
-            currency = row.find('div', {'class': 'dK_Line_Item1'}).text[1:4]
-            selling = row.find('div', {'class': 'dK_Line_Item2'}).text.strip()
-            buying = row.find('div', {'class': 'dK_Line_Item3'}).text.strip()
+    def _get_refresh_button(self):
+        # Page is refreshed using internal button for better load speeds
+        button_ = self._driver.find_element_by_class_name('dK_button1')
+        return button_
 
-            return currency, float(selling), float(buying)
+    def refresh_page(self):
+        self._refresh_button.click()
+        self.page_soup = self._load_page_soup()
 
-        except Exception as e:
-            print(f"Error in __get_row_value: {e}")
+    @staticmethod
+    def _check_table_is_not_none(table):
+        if table is None:
+            msg = "Table of Exchange Rates was not found with the given search attributes:\n"
+            msg += f"tag: {tag}\n"
+            msg += f"attrs: {tag_attrs}"
+            raise TableNotFoundException(msg)
+
+    def _get_table_rows(self):
+
+        # <table class="dk_MT">
+        #   <tr>...</tr>
+        #   .
+        #   .
+        #   .
+        #   <tr>...</tr>
+        # </table>
+        tag = 'table'
+        tag_attrs = {"class": "dk_MT"}
+
+        table = self.page_soup.find(tag, tag_attrs)
+
+        self._check_table_is_not_none(table)
+
+        rows = self._extract_table_rows(table)
+
+        return rows
+
+    def _extract_table_rows(self, table: BeautifulSoup):
+
+        # table_rows = table.findAll(recursive=False)
+        table_rows = table.findChildren(name="tr", recursive=False)
+
+        # Skip first row since it's just column names
+        table_rows = table_rows[1:]
+
+        return table_rows
+
+    def _extract_values(self, row: BeautifulSoup):
+
+        # Value rows will be like
+        # <tr class="dk_L0|1">...</tr>
+
+        # Within each <tr>, there are three <td> elements
+
+        # The first looks like: 
+        # <td>
+        #   <img ...> 
+        #   USD
+        #   <span>
+        #       Amerikan Doları
+        #   </span> 
+        # </td>
+
+        # Second: 
+        # <td>7.1500</td>   This is the selling (or bank buys) value
+
+        # Third: 
+        # <td>7.1900</td>   This is the buying (or bank sells) value
+
+        row_children = row.findAll(recursive=False)
+
+        currency = self._get_currency(row_children[0])
+        bank_buys = self._get_rate(row_children[1])
+        bank_sells = self._get_rate(row_children[2])
+        
+        return currency, bank_buys, bank_sells
+
+    @staticmethod
+    def _get_currency(value: BeautifulSoup):
+        extracted_value = value.text.strip().split(' ')[0]
+        return extracted_value
+
+    @staticmethod
+    def _get_rate(value):
+        extracted_value = value.text.strip()
+        return float(extracted_value)
+
 
     def get_single_reading(self):
-        """
-        returns a dict with this structure
-
-        {
-
-            "currency_name": 
-
-                {
-                "buying": float,
-                "selling": float 
-                }
-        }
-        """
-
-        table = self.__get_exchange_rate_table()
-
-        super_dict = dict()
-
-        for row in table:
-            # example row value: 'USD, Sold @ 6.7702 , Bought @ 7.1147'
-            row_val = self.__get_row_value(row)
-            super_dict[row_val[0]] = {
-                'selling': row_val[1],
-                'buying':  row_val[2]
-            }
-
-        return super_dict
+        
+        rows = self._get_table_rows()
+        print("Got "+ str(len(rows)) + " rows")
+        
+        for i, row in enumerate(rows):
+            print(f"Row {i + 1}: {self._extract_values(row)}")
 
 
 if __name__ == "__main__":
-    print("Please launch the file labeled main_script.py")
+    print("\n"*3 + "Please launch the file labeled main_script.py" + "\n"*3)

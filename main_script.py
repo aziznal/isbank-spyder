@@ -6,22 +6,20 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from IsbankSpyder import IsbankSpyder
 import functions as fn
+import custom_functions as c_fn
 
 
 project_settings = fn.load_project_settings()
 
 # spooder
-special_options = FirefoxOptions()
-special_options.headless = False
 
-url = "https://www.isbank.com.tr/en/foreign-exchange-rates"
+spyder = c_fn.make_spyder()
 
-spyder = IsbankSpyder(url=url, options=special_options)
+loop_count = 1
+interval = 6
+# interval = fn.create_new_loop_interval(start_hour=0, stop_hour=1, loop_count=loop_count)
 
-loop_count = 600
-interval = fn.create_new_loop_interval(start_hour=0,
-                                       stop_hour=1,
-                                       loop_count=loop_count)
+print(f"Each interval will take {interval} seconds")
 
 current_loop = 0
 
@@ -40,12 +38,11 @@ while True:
     # scrippity scrape
     try:
         results = spyder.get_single_reading()
-        results["timestamp"] = spyder.get_timestamp()
+        # results["timestamp"] = spyder.get_timestamp()
 
         # path is used again in ResultGrapher
-        # FIXME: This variable is being reassigned every loop for no reason..
-        current_results_path = fn.save_scraped_data(
-            spyder=spyder, results=results)
+        # FIXME: This variable gets reassigned every loop for no reason
+        # current_results_path = fn.save_scraped_data(spyder=spyder, results=results)
 
         sleep(interval)
 
@@ -53,14 +50,14 @@ while True:
 
     except WebDriverException as e:
         print(f"Encountered Exception during Data Getting Stage: {e}")
-        # TODO: handle exception properly before deployment
-        # IDEA: include log in email if exception is found    ___metaclass__ = ABCMeta
+        # TODO: handle e_extract_table_rowsly before deployment
+        # IDEA: include log in email if exception is found
 
 # Create graph
-path_to_graph = fn.create_graph(current_results_path)
+# path_to_graph = fn.create_graph(current_results_path)
 
 # Send Email
-fn.send_results_as_email(path_to_graph)
+# fn.send_results_as_email(path_to_graph)
 
 #   TODO: kill spyder as soon as loop is finished instead of later
 ### Exceptions may arise that prevent this code from being executed

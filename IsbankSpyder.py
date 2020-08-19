@@ -2,10 +2,10 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from time import sleep
 
-from BankSpyder import BankSpyder
-
 from selenium.common.exceptions import *
 
+from BankSpyder import BankSpyder
+from custom_functions import *
 from CustomExceptions import *
 
 
@@ -15,9 +15,9 @@ class IsbankSpyder(BankSpyder):
         super().__init__(*args, **kwargs)
 
         self._refresh_button = self._get_refresh_button()
-        self.refresh_page()
 
-        # NOTE: this is necessary to update the page html structure
+        # NOTE: Page html changes after clicking refresh, so it must be done first
+        self.refresh_page()
 
     def _get_refresh_button(self):
         # Page is refreshed using internal button for better load speeds
@@ -106,15 +106,27 @@ class IsbankSpyder(BankSpyder):
         extracted_value = value.text.strip()
         return float(extracted_value)
 
-
     def get_single_reading(self):
         
         rows = self._get_table_rows()
-        print("Got "+ str(len(rows)) + " rows")
-        
-        for i, row in enumerate(rows):
-            print(f"Row {i + 1}: {self._extract_values(row)}")
+        extracted_values = [self._extract_values(row) for row in rows]
+
+        usd_row = self._get_usd(extracted_values)
+
+        return usd_row
+
+    @staticmethod
+    def _get_usd(values):
+
+        currency_ = 'USD'
+
+        for value in values:
+            if value[0] == currency_:
+                return value
+
+        raise CurrencyNotFoundException(f"The currency {currency_} was not found in the scraped results")
+
 
 
 if __name__ == "__main__":
-    print("\n"*3 + "Please launch the file labeled main_script.py" + "\n"*3)
+    redirect_message()

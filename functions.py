@@ -16,7 +16,7 @@ def load_project_settings() -> dict:
 
 
 def get_current_time():
-    """Returns a dict with keys ['hour'] and ['minutes'] with <int> as their values"""
+    """Returns a dict with keys ['hour'] and ['minutes'] with int values"""
     current_time = datetime.now().strftime("%H-%M").split('-')
 
     return {
@@ -42,8 +42,7 @@ def save_scraped_data(spyder, results):
     # TODO: save all data in a single file instead of multiple
     # path subfolder to save current session's data in.
     results_folder_path = project_settings['results_path'] + \
-        spyder.get_timestamp(appending_to_file_name=True).split(
-            ' ')[0]     # subfolder name only includes year-day-month
+        spyder.get_timestamp(appending_to_file_name=True).split(' ')[0]     # subfolder name only includes year-day-month
 
     # if this is the first loop cycle, this creates the subfolder
     if not os.path.isdir(results_folder_path):

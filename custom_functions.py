@@ -10,3 +10,14 @@ def make_spyder():
     spyder = IsbankSpyder(url=url, options=special_options)
 
     return spyder
+
+
+def redirect_message():
+    """
+    Print message when wrong file is being ran
+    """
+    print("\n"*3 + "Please launch the file labeled main_script.py" + "\n"*3)
+
+
+if __name__ == "__main__":
+    redirect_message()

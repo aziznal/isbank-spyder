@@ -8,7 +8,7 @@ from EmailSender import EmailSender
 project_settings = {}
 
 
-def load_project_settings() -> dict:
+def load_project_settings():
     global project_settings
     with open('project_settings.json', 'r') as settings_json:
         project_settings = json.load(settings_json)

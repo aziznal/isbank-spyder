@@ -11,54 +11,49 @@ from custom_functions import *
 project_settings = load_project_settings()
 
 # spooder
-
 spyder = make_spyder()
 
-loop_count = 1
-interval = 6
-# interval = create_new_loop_interval(start_hour=0, stop_hour=1, loop_count=loop_count)
 
-print(f"Each interval will take {interval} seconds")
+def run_script():
 
-current_loop = 0
+    global spyder
 
-# A new data point will be created at every loop
-while True:
+    loop_count = 1
+    interval = 6    # seconds
 
-    # Break Condition
-    if current_loop == loop_count:
-        break
+    print(f"Each interval will take {interval} seconds")
 
-    print(f"Starting Loop {current_loop + 1} / {loop_count}")
-    current_loop += 1
+    current_loop = 0
 
-    current_time = get_current_time()
+    # A new data point will be created at every loop
+    while current_loop < loop_count:
+    
+        print(f"Starting Loop {current_loop + 1} / {loop_count}")
+        current_loop += 1
 
-    # scrippity scrape
-    try:
-        results = spyder.get_single_reading()
-        print(results)
-        # results["timestamp"] = spyder.get_timestamp()
+        # scrippity scrape
+        try:
+            results = spyder.get_single_reading()
+            sleep(interval)
+            spyder.refresh_page()
 
-        # path is used again in ResultGrapher
-        # FIXME: This variable gets reassigned every loop for no reason
-        # current_results_path = save_scraped_data(spyder=spyder, results=results)
+        except WebDriverException as e:
+            print(f"Encountered Exception during Data Getting Stage: {e}")
+            # TODO: setup exception handling
+            # IDEA: include log in email if exception is found
 
-        sleep(interval)
 
-        spyder.refresh_page()
+try: 
+    run_script()
+except Exception as e:
+    print(f"Encountered exception while running script: {e}")
 
-    except WebDriverException as e:
-        print(f"Encountered Exception during Data Getting Stage: {e}")
-        # TODO: handle e_extract_table_rowsly before deployment
-        # IDEA: include log in email if exception is found
+finally:
+    spyder.die()
+
 
 # Create graph
 # path_to_graph = create_graph(current_results_path)
 
 # Send Email
 # send_results_as_email(path_to_graph)
-
-#   TODO: kill spyder as soon as loop is finished instead of later
-### Exceptions may arise that prevent this code from being executed
-spyder.die()    # this method is better than burning your entire house

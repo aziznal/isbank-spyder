@@ -19,10 +19,10 @@ def run_script():
 
     global spyder
 
-    loop_count = 10
-    interval = 2    # seconds
+    loop_count = 128
+    interval = create_new_loop_interval(9, 17, loop_count)
 
-    print(f"Each interval will take {interval} seconds")
+    print(f"New data will be collected every {interval} seconds")
 
     current_loop = 0
 

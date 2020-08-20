@@ -26,7 +26,7 @@ def create_project_settings_file(abs_path):
 
     project_settings = {
         'abs_path': abs_path,
-        'results_path': abs_path + "/results",
+        'results_path': abs_path + "/results/results.csv",
         'graphing_results_path': abs_path + "/graphing_results"
     }
 

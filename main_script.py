@@ -18,8 +18,8 @@ def run_script():
 
     global spyder
 
-    loop_count = 1
-    interval = 6    # seconds
+    loop_count = 10
+    interval = 2    # seconds
 
     print(f"Each interval will take {interval} seconds")
 
@@ -33,8 +33,11 @@ def run_script():
 
         # scrippity scrape
         try:
-            results = spyder.get_single_reading()
+            data = spyder.get_single_reading()
+            save_data(data)
+
             sleep(interval)
+
             spyder.refresh_page()
 
         except WebDriverException as e:
@@ -57,3 +60,5 @@ finally:
 
 # Send Email
 # send_results_as_email(path_to_graph)
+
+input("Program execution has finished. Press Enter to exit")

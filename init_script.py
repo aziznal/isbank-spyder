@@ -22,12 +22,22 @@ def check_virtual_env(current_os):
         raise FileNotFoundError(msg)
 
 
-def create_project_settings_file(abs_path):
+def create_project_settings_file(current_os, abs_path):
+
+    slash = ""
+    if current_os == "Linux":
+        slash = "/"
+
+    elif current_os == "Windows":
+        slash = "\\"
+
+    else:
+        raise OSError("Unsupported OS. How did you even make it this far?")
 
     project_settings = {
         'abs_path': abs_path,
-        'results_path': abs_path + "/results/results.csv",
-        'graphing_results_path': abs_path + "/graphing_results"
+        'results_path': abs_path + f"{slash}results{slash}results.csv",
+        'graphing_results_path': abs_path + f"{slash}graphing_results"
     }
 
     print("Creating project_settings.json")
@@ -54,7 +64,8 @@ def write_to_exec_file(current_os, instructions):
         add_execute_permissions("exec.sh")
 
     elif current_os == 'Windows':
-        raise NotImplementedError("Support for Windows is not implemented yet")
+        with open('exec.bat', 'w') as exec_file:
+            [exec_file.write(line + "\n") for line in instructions]
 
     else:
         msg = "I don't know how you made it this far but your OS (%s) is not supported" % current_os
@@ -67,7 +78,7 @@ def init_linux():
 
     abs_path = os.getcwd()
 
-    create_project_settings_file(abs_path)
+    create_project_settings_file("Linux", abs_path)
 
     command_instructions = [
         f'cd "{abs_path}"',
@@ -79,7 +90,19 @@ def init_linux():
 
 
 def init_windows():
-    raise NotImplementedError("Support for Windows is not implemented yet")
+    check_virtual_env('Windows')
+
+    abs_path = os.getcwd()
+
+    create_project_settings_file("Windows", abs_path)
+
+    command_instructions = [
+        f'cd {abs_path}',
+        f'venv/Scripts/activate',
+        'python main_script.py'
+    ]
+
+    return command_instructions
 
 
 def main():

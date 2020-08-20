@@ -26,8 +26,8 @@ def create_project_settings_file(abs_path):
 
     project_settings = {
         'abs_path': abs_path,
-        'results_path': abs_path + "\\results\\",
-        'graphing_results_path': abs_path + "\\graphing_results\\"
+        'results_path': abs_path + "/results",
+        'graphing_results_path': abs_path + "/graphing_results"
     }
 
     print("Creating project_settings.json")

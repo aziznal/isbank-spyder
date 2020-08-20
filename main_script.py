@@ -1,5 +1,6 @@
 from time import sleep
 import json
+import traceback
 
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -48,8 +49,10 @@ def run_script():
 
 try: 
     run_script()
+
 except Exception as e:
     print(f"Encountered exception while running script: {e}")
+    traceback.print_exc()
 
 finally:
     spyder.die()

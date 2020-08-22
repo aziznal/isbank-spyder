@@ -3,7 +3,6 @@ import os
 from time import sleep
 import json
 from datetime import datetime
-from pprint import pprint
 from bs4 import BeautifulSoup
 
 from selenium.webdriver.firefox.options import Options

@@ -98,8 +98,9 @@ def init_windows():
 
     command_instructions = [
         f'cd {abs_path}',
-        f'venv/Scripts/activate',
-        'python main_script.py'
+        f'call venv/Scripts/activate',
+        'python main_script.py',
+        'PAUSE'
     ]
 
     return command_instructions

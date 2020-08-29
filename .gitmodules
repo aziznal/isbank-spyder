@@ -1,0 +1,3 @@
+[submodule "basic-bank-spyder"]
+	path = basic-bank-spyder
+	url = git@github.com:aziznal/basic-bank-spyder.git

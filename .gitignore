@@ -1,6 +1,7 @@
 # Files
 geckodriver.log
 project_settings.json
+exec.sh
 
 # Directories
 __pycache__

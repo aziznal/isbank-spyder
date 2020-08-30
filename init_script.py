@@ -36,8 +36,7 @@ def create_project_settings_file(current_os, abs_path):
 
     project_settings = {
         'abs_path': abs_path,
-        'results_path': abs_path + f"{slash}results{slash}results.csv",
-        'graphing_results_path': abs_path + f"{slash}graphing_results"
+        'results_path': abs_path + f"{slash}results{slash}results.csv"
     }
 
     print("Creating project_settings.json")
@@ -82,7 +81,7 @@ def init_linux():
 
     command_instructions = [
         f'cd "{abs_path}"',
-        'source venv/bin/activate',
+        '. venv/bin/activate',
         'python main_script.py'
     ]
 
@@ -98,7 +97,7 @@ def init_windows():
 
     command_instructions = [
         f'cd {abs_path}',
-        f'venv/Scripts/activate',
+        f'call venv/Scripts/activate',
         'python main_script.py'
     ]
 

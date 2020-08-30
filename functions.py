@@ -1,11 +1,24 @@
 import os
 from datetime import datetime
 import json
+import sys
+from time import sleep
 
-# from ResultGrapher import ResultGrapher
-# from EmailSender import EmailSender
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from IsbankSpider import IsbankSpider
 
 project_settings = {}
+
+
+def make_spider(url):
+    
+    options = FirefoxOptions()
+    options.headless = False
+
+    # TODO: replace with an instance of your bank spider
+    spider = IsbankSpider(url=url, options=options)
+
+    return spider
 
 
 def load_project_settings():
@@ -25,10 +38,59 @@ def get_current_time():
     }
 
 
+def get_current_day():
+    """
+    Returns nonabbreviated lowercase current day. e.g. saturday | monday
+    """
+    current_day = datetime.now().strftime('%A').lower()
+    return current_day
+
+
+def banks_are_closed():
+    
+    current_time = get_current_time()['hour']
+    current_day = get_current_day()
+
+    conditions = [
+        current_day == 'saturday',
+        current_day == 'sunday',
+        current_time < 9,
+        current_time > 18
+    ]
+
+    return any(conditions)
+
+
+def banks_are_open():
+    today = get_current_day()
+    current_time = get_current_time()
+
+    conditions = [
+        today != 'saturday',
+        today != 'sunday',
+        current_time['hour'] < 18,
+        current_time['hour'] >= 9
+    ]
+
+    return all(conditions)
+
+
+def sleep_until_banks_open():
+    today = get_current_day()
+    current_time = get_current_time()
+
+    while banks_are_closed():
+
+        sameline_print('Waiting for banks to open..')
+        sleep(1)
+
+    return
+
+
 def create_new_loop_interval(start_hour: int, stop_hour: int, loop_count: int = 20):
     """ returns a time (in seconds) given by the formula:
 
-        [ (stop_hour - start_hour) * 60 * 60 ] / loop_count
+        [ (stop_hour - start_hour) * 60 * 60 ] // loop_count
     """
 
     total_available_time = (stop_hour - start_hour) * 60 * 60   # in seconds
@@ -48,14 +110,7 @@ def already_exists(path_):
 
 
 def format_tuple(data):
-    """changes (1, 2, "b") into "1,2,b"
-
-    Args:
-
-    @param data (tuple): Tuple to convert into comma seperated string
-
-    Returns comma seperated string of tuple items
-    """
+    """ (1, 2, 'b') -> '1,2,b' """
     return ",".join([str(item) for item in data])
 
 
@@ -82,9 +137,9 @@ def prep_data(data):
 def save_data(new_data):
     """Appends new_data to results/results.csv.
 
-    If results.csv doesn't already exist, this function creates it and adds column names (time,buying,selling)
+    If results.csv doesn't already exist, this function creates it and adds column names (time,currency,buying,selling)
 
-    @param new_data (tuple): Tuple (time,buying,selling)
+    @param new_data (tuple): Tuple (time,currency,buying,selling)
     """
 
     data_file = project_settings['results_path']
@@ -97,28 +152,53 @@ def save_data(new_data):
         create_new_datafile(formatted_data, data_file)
 
 
-def create_graph(path_to_results):
-    print("\nFinished Scraping Sucessfully. Creating Graph..")
+def scrape(spyder, interval):
+    data = spyder.get_single_reading()
+    save_data(data)
 
-    grapher = ResultGrapher(results_folder_path=path_to_results)
-    path_to_graph = grapher.create_graph(save=True, show=False)
+    sleep(interval)
 
-    print("Graph Created Sucessfully")
-
-    return path_to_graph
+    spyder.refresh_page()
 
 
-def send_results_as_email(path_to_graph):
+def sameline_print(output):
+    sys.stdout.write('\r' + output)
 
-    print("\nSending Results as Email")
 
-    sender = EmailSender()
+def make_ascii_spyder():
+    print(f'''
+           ;               ,           
+         ,;                 '.         
+        ;:                   :;        
+       ::                     ::       
+       ::                     ::       
+       ':                     :        
+        :.                    :        
+     ;' ::                   ::  '     
+    .'  ';                   ;'  '.    
+   ::    :;                 ;:    ::   
+   ;      :;.             ,;:     ::   
+   :;      :;:           ,;"      ::   
+   ::.      ':;  ..,.;  ;:'     ,.;:   
+    "'"...   '::,::::: ;:   .;.;""'    
+        '"""....;:::::;,;.;"""         
+    .:::.....'"':::::::'",...;::::;.   
+   ;:' '""'"";.,;:::::;.'""""""  ':;   
+  ::'         ;::;:::;::..         :;  
+ ::         ,;:::::::::::;:..       :: 
+ ;'     ,;;:;::::::::::::::;";..    ':.
+::     ;:"  ::::::"""'::::::  ":     ::
+ :.    ::   ::::::;  :::::::   :     ; 
+  ;    ::   :::::::  :::::::   :    ;  
+   '   ::   ::::::....:::::'  ,:   '   
+    '  ::    :::::::::::::"   ::       
+       ::     ':::::::::"'    ::       
+       ':       """""""'      ::       
+        ::                   ;:        
+        ':;                 ;:"        
+-hrr-     ';              ,;'          
+            "'           '"            
+              '
 
-    sender.set_email_body("email_template.html",
-                          "I don't even know why this is here")
-    sender.set_attachment(
-        project_settings['graphing_results_path'] + path_to_graph)
+    ''')
 
-    sender.send_email()
-
-    print("Email sent successfully")

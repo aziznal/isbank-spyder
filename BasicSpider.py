@@ -12,8 +12,8 @@ default_options = Options()
 default_options.headless = True
 
 
-class BaseSpyder:
-    def __init__(self, url, buffer_time=3, options=default_options, path_to_settings="spyder_settings.json", **kwargs):
+class BasicSpider:
+    def __init__(self, url, buffer_time=3, options=default_options, **kwargs):
         """ 
         Args:
         
@@ -23,9 +23,6 @@ class BaseSpyder:
         """
 
         self.buffer_time = buffer_time
-
-        self._settings_path = path_to_settings
-        self.settings = self.load_settings()
 
         self._driver = webdriver.Firefox(options=options)
  
@@ -67,36 +64,6 @@ class BaseSpyder:
         # refresh page source to get new changes
         self.page_soup = self._load_page_soup()
 
-    def load_settings(self):
-        """
-        Loads spyder_settings.json (default name),
-        returns dict 
-        """
-
-        with open(self._settings_path) as spyder_settings_json:
-            return json.load(spyder_settings_json)
-
-    def save_settings(self):
-        """
-        saves the current running spyder's settings as json
-        """
-        try:
-
-            with open(self._settings_path, 'w') as spyder_settings_json:
-                json.dump(self.settings, spyder_settings_json, indent=4)
-                print(f"Saved spyder_settings to {self._settings_path}")
-
-        except Exception as e:
-
-            print(
-                f"Warning! couldn't save spyder_settings: {e}\nAttempting to Save data somewhere else...")
-
-            _filename = 'spyder_settings_fallback' + \
-                self.get_timestamp(appending_to_file_name=True) + '.txt'
-            with open(_filename, 'a') as _file:
-                _file.write(str(self.settings))
-
-                print(f"Saved current spyder settings to {_filename}")
 
     def get_timestamp(self, for_filename=False):
         """
@@ -120,5 +87,4 @@ class BaseSpyder:
 
     def die(self):
         print("Squashing the spyder...")
-        self.save_settings()
         self._driver.quit()

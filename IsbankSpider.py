@@ -4,12 +4,11 @@ from time import sleep
 
 from selenium.common.exceptions import *
 
-from BankSpyder import BankSpyder
-from custom_functions import *
+from BankSpider import BankSpider
 from CustomExceptions import *
 
 
-class IsbankSpyder(BankSpyder):
+class IsbankSpider(BankSpider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,20 +30,11 @@ class IsbankSpyder(BankSpyder):
     @staticmethod
     def _check_table_is_not_none(table):
         if table is None:
-            msg = "Table of Exchange Rates was not found with the given search attributes:\n"
-            msg += f"tag: {tag}\n"
-            msg += f"attrs: {tag_attrs}"
+            msg = "Table of Exchange Rates was not found"
             raise TableNotFoundException(msg)
 
     def _get_table_rows(self):
 
-        # <table class="dk_MT">
-        #   <tr>...</tr>
-        #   .
-        #   .
-        #   .
-        #   <tr>...</tr>
-        # </table>
         tag = 'table'
         tag_attrs = {"class": "dk_MT"}
 
@@ -58,7 +48,6 @@ class IsbankSpyder(BankSpyder):
 
     def _extract_table_rows(self, table: BeautifulSoup):
 
-        # table_rows = table.findAll(recursive=False)
         table_rows = table.findChildren(name="tr", recursive=False)
 
         # Skip first row since it's just column names
@@ -67,26 +56,6 @@ class IsbankSpyder(BankSpyder):
         return table_rows
 
     def _extract_values(self, row: BeautifulSoup):
-
-        # Value rows will be like
-        # <tr class="dk_L0|1">...</tr>
-
-        # Within each <tr>, there are three <td> elements
-
-        # The first looks like: 
-        # <td>
-        #   <img ...> 
-        #   USD
-        #   <span>
-        #       Amerikan Doları
-        #   </span> 
-        # </td>
-
-        # Second: 
-        # <td>7.1500</td>   This is the selling (or bank buys) value
-
-        # Third: 
-        # <td>7.1900</td>   This is the buying (or bank sells) value
 
         row_children = row.findAll(recursive=False)
 
@@ -106,15 +75,6 @@ class IsbankSpyder(BankSpyder):
         extracted_value = value.text.strip()
         return float(extracted_value)
 
-    def get_single_reading(self):
-        
-        rows = self._get_table_rows()
-        extracted_values = [self._extract_values(row) for row in rows]
-
-        usd_row = self._get_usd(extracted_values)
-
-        return usd_row
-
     @staticmethod
     def _get_usd(values):
 
@@ -126,7 +86,12 @@ class IsbankSpyder(BankSpyder):
 
         raise CurrencyNotFoundException(f"The currency {currency_} was not found in the scraped results")
 
+    
+    def get_single_reading(self):
+        
+        rows = self._get_table_rows()
+        extracted_values = [self._extract_values(row) for row in rows]
 
+        usd_row = self._get_usd(extracted_values)
 
-if __name__ == "__main__":
-    redirect_message()
+        return usd_row

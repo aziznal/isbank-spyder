@@ -1,4 +1,4 @@
-from time import sleep
+from time import sleep, perf_counter
 import json
 import traceback
 
@@ -25,14 +25,25 @@ def run_script(spyder):
         current_loop += 1
 
         try:
-            scrape(spyder, interval)
+            time1 = perf_counter()
+            scrape(spyder)
+            time2 = perf_counter()
+
+            adjusted_interval = adjust_interval(time1, time2, interval)
+
+            # If for some reason the scrape func takes longer than the actual interval
+            if adjusted_interval < 0:
+                continue
+
+            else:
+                sleep(adjusted_interval)
 
         except WebDriverException as e:
             print(f"\nEncountered Exception during Data Getting Stage: {e}")
             raise StalledSpyderException()
 
 
-crash_limit = 3
+crash_limit = 1
 load_project_settings()
 
 
@@ -76,6 +87,8 @@ while crash_limit > 0:
 
         except Exception as e:
             print("Ran into exception while destroying spyder.\nSpyder probably wasn't created yet")
+            print(e)
+            traceback.print_exc()
 
         print("\n\nScript seems to have crashed")
         print("Attempting to start again..\n\n")

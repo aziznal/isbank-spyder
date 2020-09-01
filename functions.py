@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 import json
 import sys
-from time import sleep
+from time import sleep, perf_counter
 
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from IsbankSpider import IsbankSpider
@@ -15,7 +15,6 @@ def make_spider(url):
     options = FirefoxOptions()
     options.headless = False
 
-    # TODO: replace with an instance of your bank spider
     spider = IsbankSpider(url=url, options=options)
 
     return spider
@@ -55,7 +54,7 @@ def banks_are_closed():
         current_day == 'saturday',
         current_day == 'sunday',
         current_time < 9,
-        current_time > 18
+        current_time >= 18
     ]
 
     return any(conditions)
@@ -152,11 +151,20 @@ def save_data(new_data):
         create_new_datafile(formatted_data, data_file)
 
 
-def scrape(spyder, interval):
+def adjust_interval(time1, time2, interval):
+    """
+    return an adjusted interval that takes into account how long instructions
+    between time2 and time1 took to execute
+    """
+
+    time_elapsed = round(time2 - time1, 4)
+
+    return interval - time_elapsed
+
+
+def scrape(spyder):
     data = spyder.get_single_reading()
     save_data(data)
-
-    sleep(interval)
 
     spyder.refresh_page()
 
